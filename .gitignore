@@ -1,0 +1,36 @@
+# Secrets: keep keys out of git
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Runtime data written by the app (paths resolve from backend/)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+backend/data/
+backend/reports/
+
+# Dashboard
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

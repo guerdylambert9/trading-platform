@@ -1,0 +1,29 @@
+"""Broker interface. AlpacaBroker talks to Alpaca; FakeBroker runs the demo and the tests."""
+
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Protocol, runtime_checkable
+
+from trader.models import AccountInfo, BrokerOrder, MarketClock, OrderIntent, Position
+
+
+@runtime_checkable
+class Broker(Protocol):
+    def get_account(self) -> AccountInfo: ...
+
+    def get_positions(self) -> list[Position]: ...
+
+    def get_open_orders(self, symbol: str | None = None) -> list[BrokerOrder]: ...
+
+    def get_orders_since(self, since: datetime) -> list[BrokerOrder]: ...
+
+    def get_order_by_client_id(self, client_order_id: str) -> BrokerOrder | None: ...
+
+    def submit_limit_order(self, intent: OrderIntent) -> BrokerOrder: ...
+
+    def cancel_order(self, order_id: str) -> None: ...
+
+    def latest_price(self, symbol: str) -> float: ...
+
+    def clock(self) -> MarketClock: ...

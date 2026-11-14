@@ -1,0 +1,42 @@
+# Postgres plus the app (API, scheduler and dashboard) for a small server.
+# Fill in .env first: BROKER, your Alpaca keys and API_TOKEN. Then: docker compose up -d --build
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: trader
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: trader
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trader -d trader"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://trader:${POSTGRES_PASSWORD:-change-me}@db:5432/trader
+      ENABLE_SCHEDULER: "true"
+    ports:
+      # Reachable from this machine only. Put an HTTPS proxy in front to reach it from elsewhere.
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - appdata:/app/backend/data
+      - reports:/app/backend/reports
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  appdata:
+  reports:

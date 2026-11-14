@@ -1,0 +1,981 @@
+/*
+  Trading desk: ledger paper.
+  Pale green-grey columnar paper, deep green-black ink, green-bar striping on tables,
+  order tickets for approvals. Colour is reserved for meaning: green = go/gain,
+  red = stop/loss/kill, amber = waiting or close to a limit.
+*/
+
+:root {
+  --paper: #eaf0eb;
+  --band: #dce7de;
+  --sheet: #f6f9f6;
+  --ink: #15291f;
+  --ink-soft: #4a5f54;
+  --rule: #bccdc1;
+  --rule-strong: #8fa597;
+  --go: #1e6b45;
+  --go-wash: #d4e7da;
+  --stop: #b3361f;
+  --stop-wash: #f4dcd5;
+  --wait: #8a5d0c;
+  --mode-demo: #3d4b5c;
+  --mode-paper: #2c5d8a;
+  --mode-live: #d0431a;
+
+  --font: "Archivo Variable", "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --size-small: 0.8125rem;
+  --size-body: 0.9375rem;
+  --size-lead: 1.125rem;
+  --size-figure: 1.5rem;
+  --size-title: 2.25rem;
+  --size-hero: 3rem;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+}
+
+body {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+code {
+  font-size: 0.92em;
+  background: var(--band);
+  padding: 0.05em 0.35em;
+  border-radius: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+.small {
+  font-size: var(--size-small);
+}
+
+.up {
+  color: var(--go);
+}
+
+.down,
+.warn {
+  color: var(--stop);
+}
+
+.warn {
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------- mode band */
+
+.mode-band {
+  color: #fff;
+  font-size: var(--size-small);
+}
+
+.mode-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 7px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+
+.mode-name {
+  font-size: var(--size-lead);
+  font-stretch: 75%;
+  font-weight: 700;
+}
+
+.mode-extra {
+  font-weight: 600;
+}
+
+.mode-demo {
+  background: var(--mode-demo);
+}
+
+.mode-paper {
+  background: var(--mode-paper);
+}
+
+.mode-live {
+  background: repeating-linear-gradient(-45deg, var(--mode-live) 0 14px, #2b1a10 14px 28px);
+}
+
+.mode-live .mode-inner > * {
+  background: var(--mode-live);
+  padding: 1px 8px;
+}
+
+/* --------------------------------------------------------------- layout */
+
+.desk {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 24px 64px;
+}
+
+.desk.narrow {
+  max-width: 560px;
+  padding-top: 64px;
+}
+
+.boot {
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.desk-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px 32px;
+  margin-bottom: 22px;
+}
+
+.desk-head > div:first-child {
+  max-width: 44rem;
+}
+
+h1 {
+  font-size: var(--size-title);
+  font-stretch: 78%;
+  font-weight: 760;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+h2 {
+  font-size: var(--size-lead);
+  font-weight: 650;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+h3 {
+  font-size: var(--size-body);
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+
+.spaced {
+  margin-top: 26px;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+}
+
+.side {
+  display: grid;
+  gap: 32px;
+}
+
+.section {
+  margin-top: 44px;
+}
+
+.lower {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px;
+  margin-top: 44px;
+}
+
+.foot {
+  margin-top: 56px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  max-width: 60rem;
+}
+
+/* --------------------------------------------------------------- figures */
+
+.figure,
+.figure-sm,
+.ledger,
+.ticket-terms dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.figure {
+  font-stretch: 72%;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.figure-sm {
+  font-weight: 600;
+}
+
+/* Totals take a double rule, the way a ledger marks them. */
+.stats {
+  display: grid;
+  grid-template-columns: 1.7fr repeat(4, minmax(0, 1fr));
+  margin: 0 0 32px;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 3px double var(--rule-strong);
+}
+
+.stat {
+  padding: 12px 16px 14px;
+  border-left: 1px solid var(--rule);
+}
+
+.stat:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.stat dt {
+  font-size: var(--size-small);
+  color: var(--ink-soft);
+}
+
+.stat dd {
+  margin: 2px 0 0;
+  font-size: var(--size-figure);
+  line-height: 1.15;
+}
+
+.stat-equity dd {
+  font-size: var(--size-hero);
+  line-height: 1;
+}
+
+.of {
+  font-size: var(--size-body);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 1.15em;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  font-weight: 620;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--band);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-go {
+  background: var(--go);
+  border-color: var(--go);
+  color: #fff;
+}
+
+.btn-go:hover:not(:disabled) {
+  background: #17573a;
+}
+
+.btn-stop {
+  background: var(--stop);
+  border-color: var(--stop);
+  color: #fff;
+}
+
+.btn-stop:hover:not(:disabled) {
+  background: #952b18;
+}
+
+.btn-quiet {
+  border-color: var(--rule-strong);
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  min-width: 0;
+  padding: 0.5em 0.75em;
+  border: 1px solid var(--rule-strong);
+  border-radius: 6px;
+  background: #fff;
+}
+
+label {
+  font-size: var(--size-small);
+  font-weight: 600;
+}
+
+.inline-field {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* --------------------------------------------------------------- kill switch */
+
+.kill {
+  width: min(100%, 25rem);
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.kill-guard {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px 9px 12px;
+  border: 2px solid var(--stop);
+  border-radius: 8px;
+  background: var(--sheet);
+  color: var(--stop);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kill-guard:hover {
+  background: var(--stop-wash);
+}
+
+.switch-icon {
+  position: relative;
+  width: 30px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+}
+
+.switch-icon::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.kill-open,
+.kill-engaged {
+  justify-items: stretch;
+  padding: 14px 16px;
+  border: 2px solid var(--stop);
+  border-radius: 8px;
+  background: var(--sheet);
+}
+
+.kill-engaged {
+  background: var(--stop-wash);
+}
+
+.kill-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--stop);
+}
+
+.kill-light {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--stop);
+  box-shadow: 0 0 0 4px rgb(179 54 31 / 0.2);
+}
+
+.kill-form {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.kill-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* --------------------------------------------------------------- tickets */
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-bottom: 4px;
+}
+
+.tickets {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.ticket {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--sheet);
+}
+
+.ticket::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--go);
+}
+
+.ticket.side-sell::before {
+  background: var(--stop);
+}
+
+.ticket-body {
+  padding: 16px 20px 14px 24px;
+  display: grid;
+  gap: 8px;
+}
+
+.ticket-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.35em;
+  font-stretch: 70%;
+  font-weight: 760;
+  line-height: 1;
+}
+
+.ticket-side {
+  font-size: var(--size-figure);
+  color: var(--go);
+}
+
+.side-sell .ticket-side {
+  color: var(--stop);
+}
+
+.ticket-qty,
+.ticket-symbol {
+  font-size: var(--size-hero);
+  letter-spacing: -0.01em;
+}
+
+.ticket-qty {
+  font-variant-numeric: tabular-nums;
+  font-weight: 560;
+}
+
+.ticket-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  margin: 0;
+}
+
+.ticket-terms dt {
+  font-size: var(--size-small);
+  color: var(--ink-soft);
+}
+
+.ticket-terms dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.ticket-reason {
+  color: var(--ink);
+}
+
+.ticket-ai {
+  font-size: var(--size-small);
+  font-weight: 600;
+  color: var(--wait);
+}
+
+/* The stub: a perforated edge with two notches, like a torn-off order ticket. */
+.ticket-stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-width: 9.5rem;
+  padding: 16px 18px;
+  border-left: 2px dashed var(--rule-strong);
+}
+
+.ticket-stub::before,
+.ticket-stub::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.ticket-stub::before {
+  top: -10px;
+}
+
+.ticket-stub::after {
+  bottom: -10px;
+}
+
+.decided {
+  margin-top: 26px;
+}
+
+.decided-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.decided-row {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--size-small);
+}
+
+.decided-status {
+  font-weight: 650;
+}
+
+.status-blocked .decided-status,
+.status-error .decided-status,
+.status-rejected .decided-status {
+  color: var(--stop);
+}
+
+.status-filled .decided-status,
+.status-approved .decided-status,
+.status-submitted .decided-status {
+  color: var(--go);
+}
+
+.decided-why {
+  grid-column: 2 / -1;
+  color: var(--ink-soft);
+}
+
+/* --------------------------------------------------------------- panels */
+
+.empty {
+  padding: 16px 18px;
+  border: 1px dashed var(--rule-strong);
+  border-radius: 4px;
+  color: var(--ink-soft);
+}
+
+.notice {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 18px 20px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 6px;
+  background: var(--sheet);
+}
+
+.notice-bad {
+  display: block;
+  margin-bottom: 20px;
+  border-color: var(--stop);
+  background: var(--stop-wash);
+}
+
+.chart-summary {
+  margin: -4px 0 8px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart svg {
+  display: block;
+  max-width: 100%;
+  touch-action: none;
+}
+
+.chart .grid line {
+  stroke: var(--rule);
+}
+
+.chart .axis text {
+  fill: var(--ink-soft);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.line-account {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.line-bench {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.focus line {
+  stroke: var(--ink-soft);
+  stroke-width: 1;
+}
+
+.focus circle {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 6px;
+  font-size: var(--size-small);
+  color: var(--ink-soft);
+}
+
+.key-account::before,
+.key-bench::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border-top: 2px solid var(--ink);
+}
+
+.key-bench::before {
+  border-top: 2px dashed var(--rule-strong);
+}
+
+.chart-readout {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.meters {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.meter-text {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--size-small);
+}
+
+.meter-track {
+  height: 6px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--band);
+}
+
+.meter-fill {
+  height: 100%;
+  background: var(--go);
+}
+
+.meter-near .meter-fill {
+  background: var(--wait);
+}
+
+.meter-hit .meter-fill {
+  background: var(--stop);
+}
+
+.limits-list {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 1.1em;
+  color: var(--ink-soft);
+  font-size: var(--size-small);
+}
+
+.check-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.dot-ok {
+  background: var(--go);
+}
+
+.dot-bad {
+  background: var(--stop);
+}
+
+.problems {
+  margin: 8px 0 0;
+  padding-left: 1.1em;
+  color: var(--stop);
+  font-size: var(--size-small);
+}
+
+.jobs {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.job {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+/* --------------------------------------------------------------- ledger tables */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ledger th,
+.ledger td {
+  padding: 8px 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ledger thead th {
+  font-size: var(--size-small);
+  font-weight: 600;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.ledger tbody th {
+  font-weight: 650;
+}
+
+/* Green-bar paper: bands of three rows. */
+.ledger tbody tr:nth-child(6n + 1),
+.ledger tbody tr:nth-child(6n + 2),
+.ledger tbody tr:nth-child(6n + 3) {
+  background: var(--band);
+}
+
+.ledger .num {
+  text-align: right;
+}
+
+.ledger.compact th,
+.ledger.compact td {
+  padding: 5px 8px;
+  font-size: var(--size-small);
+}
+
+.ledger tr.dim {
+  color: var(--ink-soft);
+}
+
+.symbol {
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.side-word {
+  font-weight: 650;
+}
+
+.side-word.buy {
+  color: var(--go);
+}
+
+.side-word.sell {
+  color: var(--stop);
+}
+
+/* --------------------------------------------------------------- toast */
+
+.toast-region {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10;
+  width: min(26rem, calc(100vw - 40px));
+}
+
+.toast {
+  padding: 12px 16px;
+  border-left: 5px solid var(--rule-strong);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 6px 24px rgb(21 41 31 / 0.25);
+  animation: toast-in 180ms ease-out;
+}
+
+.toast-good {
+  border-left-color: #74c493;
+}
+
+.toast-bad {
+  border-left-color: #ec8a70;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* --------------------------------------------------------------- responsive */
+
+@media (max-width: 980px) {
+  .main-grid,
+  .lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-equity {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .stat:nth-child(2),
+  .stat:nth-child(4) {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .desk {
+    padding: 20px 16px 48px;
+  }
+
+  .mode-inner {
+    padding: 7px 16px;
+  }
+
+  .ticket {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ticket-stub {
+    flex-direction: row;
+    border-left: 0;
+    border-top: 2px dashed var(--rule-strong);
+  }
+
+  .ticket-stub::before,
+  .ticket-stub::after {
+    display: none;
+  }
+
+  .ticket-qty,
+  .ticket-symbol {
+    font-size: var(--size-title);
+  }
+
+  .decided-row {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+  }
+
+  .decided-when {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

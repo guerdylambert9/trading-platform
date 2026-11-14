@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "alpaca-live-readonly": {
+      "command": "uvx",
+      "args": ["alpaca-mcp-server"],
+      "env": {
+        "ALPACA_API_KEY": "your-live-key",
+        "ALPACA_SECRET_KEY": "your-live-secret",
+        "ALPACA_PAPER_TRADE": "false",
+        "ALPACA_TOOLSETS": "account,assets,stock-data,news"
+      }
+    }
+  }
+}
